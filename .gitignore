@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Claude Code (local overrides)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# Agent operational output (never committed — Rule #70)
+docs/agents/
+logs/
+scripts/agents/
+
+# Vercel
+.vercel
+
+# Testing
+coverage/
