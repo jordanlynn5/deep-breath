@@ -11,7 +11,7 @@ async function rateAllVitals(user: ReturnType<typeof userEvent.setup>) {
 describe('CheckinPage', () => {
   it('starts on the air quality step', () => {
     render(<CheckinPage />)
-    expect(screen.getByText('42')).toBeInTheDocument()
+    expect(screen.getByText(/air quality index/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /start check-in/i })).toBeInTheDocument()
   })
 
