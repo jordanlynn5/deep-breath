@@ -8,7 +8,8 @@ import BranchStep from '@/components/checkin/BranchStep'
 import SymptomPickerStep from '@/components/checkin/SymptomPickerStep'
 import ReflectionStep from '@/components/checkin/ReflectionStep'
 import InsightStep from '@/components/checkin/InsightStep'
-import type { VitalName } from '@/types'
+import { saveCheckIn } from '@/utils/storage'
+import type { VitalName, AqiSnapshot } from '@/types'
 
 // Step IDs in order
 type StepId = 'aqi' | 'vitals' | 'lowVital' | 'branch' | 'symptoms' | 'reflection' | 'insight'
@@ -19,6 +20,10 @@ export default function CheckinPage() {
   const [stepId, setStepId] = useState<StepId>('aqi')
   const [ratings, setRatings] = useState<Record<VitalName, number> | null>(null)
   const [hasSymptoms, setHasSymptoms] = useState(false)
+  const [aqiSnapshot, setAqiSnapshot] = useState<AqiSnapshot | null>(null)
+  const [symptoms, setSymptoms] = useState<string[]>([])
+  const [reflection, setReflection] = useState('')
+  const [lowVitalTags, setLowVitalTags] = useState<string[]>([])
 
   const lowVitals: VitalName[] = ratings
     ? (Object.entries(ratings) as [VitalName, number][])
@@ -44,6 +49,24 @@ export default function CheckinPage() {
     if (prev) setStepId(prev)
   }
 
+  const handleGoToInsight = (reflectionText: string) => {
+    if (ratings) {
+      const today = new Date()
+      saveCheckIn({
+        id: today.toISOString(),
+        date: today.toISOString().slice(0, 10),
+        timestamp: today.getTime(),
+        vitals: ratings,
+        lowVitalTags,
+        hasSymptoms,
+        symptoms,
+        reflection: reflectionText,
+        aqi: aqiSnapshot,
+      })
+    }
+    setStepId('insight')
+  }
+
   if (stepId === 'aqi') {
     return (
       <AnimatePresence initial={false}>
@@ -54,7 +77,12 @@ export default function CheckinPage() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <AirQualityStep onStart={goNext} />
+          <AirQualityStep
+            onStart={(snapshot?: AqiSnapshot | null) => {
+              setAqiSnapshot(snapshot ?? null)
+              goNext()
+            }}
+          />
         </motion.div>
       </AnimatePresence>
     )
@@ -85,7 +113,13 @@ export default function CheckinPage() {
             />
           )}
           {stepId === 'lowVital' && (
-            <LowVitalStep lowVitals={lowVitals} onContinue={goNext} />
+            <LowVitalStep
+              lowVitals={lowVitals}
+              onContinue={(tags: string[]) => {
+                setLowVitalTags(tags)
+                goNext()
+              }}
+            />
           )}
           {stepId === 'branch' && (
             <BranchStep
@@ -99,9 +133,29 @@ export default function CheckinPage() {
               }}
             />
           )}
-          {stepId === 'symptoms' && <SymptomPickerStep onContinue={goNext} />}
-          {stepId === 'reflection' && <ReflectionStep onSubmit={goNext} onSkip={goNext} />}
-          {stepId === 'insight' && <InsightStep onDone={() => setStepId('aqi')} />}
+          {stepId === 'symptoms' && (
+            <SymptomPickerStep
+              onContinue={(selected: string[]) => {
+                setSymptoms(selected)
+                goNext()
+              }}
+            />
+          )}
+          {stepId === 'reflection' && (
+            <ReflectionStep
+              onSubmit={(text: string) => {
+                setReflection(text)
+                handleGoToInsight(text)
+              }}
+              onSkip={() => handleGoToInsight(reflection)}
+            />
+          )}
+          {stepId === 'insight' && (
+            <InsightStep
+              onDone={() => setStepId('aqi')}
+              aqi={aqiSnapshot}
+            />
+          )}
         </CheckinLayout>
       </motion.div>
     </AnimatePresence>

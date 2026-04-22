@@ -1,5 +1,9 @@
+import { getStreak } from '@/utils/storage'
+import type { AqiSnapshot } from '@/types'
+
 interface InsightStepProps {
   onDone: () => void
+  aqi: AqiSnapshot | null
 }
 
 // Score 1–5 → color. 0 = no entry (gray).
@@ -22,6 +26,8 @@ const PLACEHOLDER_SCORES = [
 ]
 
 export default function InsightStep({ onDone }: InsightStepProps) {
+  const streak = getStreak()
+
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div className="flex flex-col gap-2 text-center">
@@ -45,10 +51,10 @@ export default function InsightStep({ onDone }: InsightStepProps) {
         <span className="text-2xl">🔥</span>
         <div className="flex flex-col">
           <span className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-            3 day streak
+            {streak > 0 ? `${streak} day streak` : 'First check-in!'}
           </span>
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            Keep it going!
+            {streak > 0 ? 'Keep it going!' : 'Welcome to Deep Breath.'}
           </span>
         </div>
       </div>

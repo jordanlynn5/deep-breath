@@ -19,7 +19,7 @@ const VITAL_QUESTIONS: Record<VitalName, string> = {
 
 interface LowVitalStepProps {
   lowVitals: VitalName[]
-  onContinue: () => void
+  onContinue: (tags: string[]) => void
 }
 
 export default function LowVitalStep({ lowVitals, onContinue }: LowVitalStepProps) {
@@ -74,7 +74,7 @@ export default function LowVitalStep({ lowVitals, onContinue }: LowVitalStepProp
 
       <button
         type="button"
-        onClick={onContinue}
+        onClick={() => onContinue(Array.from(selected))}
         className="rounded-full bg-teal-500 px-8 py-3 text-white transition-colors hover:bg-teal-600"
       >
         Continue

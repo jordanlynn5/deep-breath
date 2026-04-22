@@ -1,7 +1,8 @@
 import { getProfile } from '@/utils/storage'
+import type { AqiSnapshot } from '@/types'
 
 interface AirQualityStepProps {
-  onStart: () => void
+  onStart: (snapshot?: AqiSnapshot | null) => void
 }
 
 export default function AirQualityStep({ onStart }: AirQualityStepProps) {
@@ -44,7 +45,7 @@ export default function AirQualityStep({ onStart }: AirQualityStepProps) {
       </div>
       <button
         type="button"
-        onClick={onStart}
+        onClick={() => onStart(null)}
         className="rounded-full bg-teal-500 px-8 py-3 text-white transition-colors hover:bg-teal-600"
       >
         Start Check-in
