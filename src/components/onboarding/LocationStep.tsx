@@ -1,9 +1,15 @@
+import { useState } from 'react'
+
 interface LocationStepProps {
-  onAllow: () => void
-  onSkip: () => void
+  city: string
+  onCityChange: (city: string) => void
+  onContinue: () => void
 }
 
-export default function LocationStep({ onAllow, onSkip }: LocationStepProps) {
+export default function LocationStep({ city, onCityChange, onContinue }: LocationStepProps) {
+  const [touched, setTouched] = useState(false)
+  const isValid = city.trim().length > 1
+
   return (
     <div className="flex flex-col items-center gap-8 text-center">
       <div className="flex h-16 w-16 items-center justify-center rounded-full bg-teal-100 dark:bg-teal-900/30">
@@ -14,28 +20,35 @@ export default function LocationStep({ onAllow, onSkip }: LocationStepProps) {
       </div>
       <div className="flex flex-col gap-2">
         <h2 className="text-2xl font-light text-gray-800 dark:text-gray-100">
-          Enable Location
+          Where are you based?
         </h2>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          We'll use your location to find nearby air quality stations and show you relevant data.
+          We'll find air quality data for your city.
         </p>
       </div>
-      <div className="flex w-full max-w-xs flex-col gap-3">
-        <button
-          type="button"
-          onClick={onAllow}
-          className="rounded-full bg-teal-500 px-8 py-3 text-white transition-colors hover:bg-teal-600"
-        >
-          Allow Location
-        </button>
-        <button
-          type="button"
-          onClick={onSkip}
-          className="rounded-full px-8 py-3 text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-        >
-          Skip for Now
-        </button>
+      <div className="w-full max-w-xs">
+        <input
+          type="text"
+          value={city}
+          onChange={(e) => onCityChange(e.target.value)}
+          onBlur={() => setTouched(true)}
+          placeholder="e.g. Oakland, CA"
+          className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-center text-gray-800 outline-none transition-colors focus:border-teal-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+        />
+        {touched && !isValid && (
+          <p className="mt-2 text-xs text-red-400">Please enter your city.</p>
+        )}
       </div>
+      <button
+        type="button"
+        onClick={() => {
+          setTouched(true)
+          if (isValid) onContinue()
+        }}
+        className="rounded-full bg-teal-500 px-8 py-3 text-white transition-colors hover:bg-teal-600 disabled:opacity-50"
+      >
+        Continue
+      </button>
     </div>
   )
 }

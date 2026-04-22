@@ -12,7 +12,7 @@ export default function WelcomeStep({ name, onNameChange, onContinue }: WelcomeS
           Deep Breath
         </h2>
         <p className="text-gray-500 dark:text-gray-400">
-          Your daily air &amp; wellbeing journal
+          Track how air quality shapes how you feel.
         </p>
       </div>
       <div className="w-full max-w-xs">

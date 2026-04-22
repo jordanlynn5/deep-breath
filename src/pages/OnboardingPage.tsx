@@ -6,14 +6,21 @@ import LocationStep from '@/components/onboarding/LocationStep'
 import NotificationTimeStep from '@/components/onboarding/NotificationTimeStep'
 import NotificationPermissionStep from '@/components/onboarding/NotificationPermissionStep'
 import DoneStep from '@/components/onboarding/DoneStep'
+import { saveProfile } from '@/utils/storage'
 
 const TOTAL_STEPS = 5
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(0)
   const [name, setName] = useState('')
+  const [city, setCity] = useState('')
 
-  const next = () => setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1))
+  const next = () => {
+    if (step === TOTAL_STEPS - 2) {
+      saveProfile({ name: name.trim(), city: city.trim(), onboardingComplete: true })
+    }
+    setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1))
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-teal-50 dark:bg-gray-900">
@@ -33,7 +40,9 @@ export default function OnboardingPage() {
             {step === 0 && (
               <WelcomeStep name={name} onNameChange={setName} onContinue={next} />
             )}
-            {step === 1 && <LocationStep onAllow={next} onSkip={next} />}
+            {step === 1 && (
+              <LocationStep city={city} onCityChange={setCity} onContinue={next} />
+            )}
             {step === 2 && <NotificationTimeStep onContinue={next} />}
             {step === 3 && (
               <NotificationPermissionStep onEnable={next} onSkip={next} />

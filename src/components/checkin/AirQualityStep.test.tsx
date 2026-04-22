@@ -8,9 +8,14 @@ describe('AirQualityStep', () => {
     expect(screen.getByText('42')).toBeInTheDocument()
   })
 
-  it('renders a station name', () => {
+  it('renders the Air Quality Index label', () => {
     render(<AirQualityStep onStart={vi.fn()} />)
-    expect(screen.getByText(/oakland/i)).toBeInTheDocument()
+    expect(screen.getByText('Air Quality Index')).toBeInTheDocument()
+  })
+
+  it('renders a city location line', () => {
+    render(<AirQualityStep onStart={vi.fn()} />)
+    expect(screen.getByText(/today in/i)).toBeInTheDocument()
   })
 
   it('calls onStart when clicking Start Check-in', async () => {

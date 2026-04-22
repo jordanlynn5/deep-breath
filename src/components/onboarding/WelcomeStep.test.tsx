@@ -12,7 +12,7 @@ describe('WelcomeStep', () => {
   it('renders the app title and subtitle', () => {
     render(<WelcomeStep {...defaultProps} />)
     expect(screen.getByText('Deep Breath')).toBeInTheDocument()
-    expect(screen.getByText(/daily air/i)).toBeInTheDocument()
+    expect(screen.getByText(/air quality shapes/i)).toBeInTheDocument()
   })
 
   it('renders a name input', () => {

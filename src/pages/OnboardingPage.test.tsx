@@ -11,7 +11,7 @@ describe('OnboardingPage', () => {
   it('advances to the location step on Continue', async () => {
     render(<OnboardingPage />)
     await userEvent.setup().click(screen.getByRole('button', { name: /continue/i }))
-    expect(screen.getByText('Enable Location')).toBeInTheDocument()
+    expect(screen.getByText('Where are you based?')).toBeInTheDocument()
   })
 
   it('advances through all steps to the Done step', async () => {
@@ -19,8 +19,9 @@ describe('OnboardingPage', () => {
     render(<OnboardingPage />)
     // Step 0: Welcome
     await user.click(screen.getByRole('button', { name: /continue/i }))
-    // Step 1: Location
-    await user.click(screen.getByRole('button', { name: /skip for now/i }))
+    // Step 1: Location — type a city then continue
+    await user.type(screen.getByPlaceholderText(/oakland/i), 'Oakland, CA')
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     // Step 2: Notification Time
     await user.click(screen.getByRole('button', { name: /continue/i }))
     // Step 3: Notification Permission
@@ -34,7 +35,8 @@ describe('OnboardingPage', () => {
     render(<OnboardingPage />)
     await user.type(screen.getByLabelText(/what should we call you/i), 'Jordan')
     await user.click(screen.getByRole('button', { name: /continue/i }))
-    await user.click(screen.getByRole('button', { name: /skip for now/i }))
+    await user.type(screen.getByPlaceholderText(/oakland/i), 'Oakland, CA')
+    await user.click(screen.getByRole('button', { name: /continue/i }))
     await user.click(screen.getByRole('button', { name: /continue/i }))
     await user.click(screen.getByRole('button', { name: /not now/i }))
     expect(screen.getByText(/welcome, jordan/i)).toBeInTheDocument()

@@ -2,13 +2,26 @@ interface InsightStepProps {
   onDone: () => void
 }
 
-export default function InsightStep({ onDone }: InsightStepProps) {
-  // Placeholder heatmap: 7 cols x 5 rows
-  const heatmapDays = Array.from({ length: 35 }, (_, i) => {
-    const intensity = [0, 0.2, 0.4, 0.6, 0.8][i % 5] ?? 0
-    return { key: i, intensity }
-  })
+// Score 1–5 → color. 0 = no entry (gray).
+function scoreColor(score: number): string {
+  if (score === 0) return '#e5e7eb'
+  if (score === 1) return '#ef4444'
+  if (score === 2) return '#f97316'
+  if (score === 3) return '#f59e0b'
+  if (score === 4) return '#5eead4'
+  return '#0d9488'
+}
 
+// Placeholder data: varied scores to show the full color range
+const PLACEHOLDER_SCORES = [
+  0, 4, 3, 5, 5, 2, 0,
+  5, 4, 0, 4, 3, 5, 4,
+  3, 2, 4, 0, 4, 5, 3,
+  1, 3, 5, 4, 0, 4, 5,
+  4, 5, 2, 4, 5, 4, 5,
+]
+
+export default function InsightStep({ onDone }: InsightStepProps) {
   return (
     <div className="flex flex-1 flex-col gap-6">
       <div className="flex flex-col gap-2 text-center">
@@ -41,18 +54,26 @@ export default function InsightStep({ onDone }: InsightStepProps) {
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
-          Last 5 weeks
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            Last 5 weeks
+          </p>
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: '#ef4444' }} /> Low
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: '#0d9488' }} /> High
+            </span>
+          </div>
+        </div>
         <div className="grid grid-cols-7 gap-1">
-          {heatmapDays.map(({ key, intensity }) => (
+          {PLACEHOLDER_SCORES.map((score, i) => (
             <div
-              key={key}
+              key={i}
               className="aspect-square rounded-sm"
-              style={{
-                backgroundColor:
-                  intensity === 0 ? 'var(--color-gray-200, #e5e7eb)' : `rgba(20, 184, 166, ${intensity})`,
-              }}
+              style={{ backgroundColor: scoreColor(score) }}
+              title={score === 0 ? 'No entry' : `Score: ${score}/5`}
             />
           ))}
         </div>

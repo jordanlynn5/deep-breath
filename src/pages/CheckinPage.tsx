@@ -3,23 +3,48 @@ import { AnimatePresence, motion } from 'framer-motion'
 import CheckinLayout from '@/components/checkin/CheckinLayout'
 import AirQualityStep from '@/components/checkin/AirQualityStep'
 import VitalsStep from '@/components/checkin/VitalsStep'
+import LowVitalStep from '@/components/checkin/LowVitalStep'
 import BranchStep from '@/components/checkin/BranchStep'
 import SymptomPickerStep from '@/components/checkin/SymptomPickerStep'
 import ReflectionStep from '@/components/checkin/ReflectionStep'
 import InsightStep from '@/components/checkin/InsightStep'
+import type { VitalName } from '@/types'
 
-const TOTAL_STEPS = 6
+// Step IDs in order
+type StepId = 'aqi' | 'vitals' | 'lowVital' | 'branch' | 'symptoms' | 'reflection' | 'insight'
+
+const ALL_STEPS: StepId[] = ['aqi', 'vitals', 'lowVital', 'branch', 'symptoms', 'reflection', 'insight']
 
 export default function CheckinPage() {
-  const [step, setStep] = useState(0)
+  const [stepId, setStepId] = useState<StepId>('aqi')
+  const [ratings, setRatings] = useState<Record<VitalName, number> | null>(null)
   const [hasSymptoms, setHasSymptoms] = useState(false)
 
-  const goTo = (next: number) => setStep(Math.max(0, Math.min(next, TOTAL_STEPS - 1)))
-  const next = () => goTo(step + 1)
-  const back = () => goTo(step - 1)
+  const lowVitals: VitalName[] = ratings
+    ? (Object.entries(ratings) as [VitalName, number][])
+        .filter(([, v]) => v <= 3)
+        .map(([k]) => k)
+    : []
 
-  // Step 1 (AirQuality) and 5 (Insight) are fullscreen — no CheckinLayout chrome.
-  if (step === 0) {
+  const visibleSteps: StepId[] = ALL_STEPS.filter((id) => {
+    if (id === 'lowVital') return lowVitals.length > 0
+    if (id === 'symptoms') return hasSymptoms
+    return true
+  })
+
+  const currentIndex = visibleSteps.indexOf(stepId)
+  const totalSteps = visibleSteps.length
+
+  const goNext = () => {
+    const next = visibleSteps[currentIndex + 1]
+    if (next) setStepId(next)
+  }
+  const goBack = () => {
+    const prev = visibleSteps[currentIndex - 1]
+    if (prev) setStepId(prev)
+  }
+
+  if (stepId === 'aqi') {
     return (
       <AnimatePresence initial={false}>
         <motion.div
@@ -29,39 +54,54 @@ export default function CheckinPage() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          <AirQualityStep onStart={next} />
+          <AirQualityStep onStart={goNext} />
         </motion.div>
       </AnimatePresence>
     )
   }
 
+  const stepIndex = visibleSteps.indexOf(stepId)
+
   return (
     <AnimatePresence initial={false}>
       <motion.div
-        key={step}
+        key={stepId}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -20 }}
         transition={{ duration: 0.2, ease: 'easeOut' }}
       >
         <CheckinLayout
-          currentStep={step}
-          totalSteps={TOTAL_STEPS}
-          onBack={back}
-          onNext={step === 1 ? undefined : undefined}
+          currentStep={stepIndex}
+          totalSteps={totalSteps}
+          onBack={goBack}
         >
-          {step === 1 && <VitalsStep onComplete={next} />}
-          {step === 2 && (
-            <BranchStep
-              onAnswer={(answer) => {
-                setHasSymptoms(answer)
-                goTo(answer ? 3 : 4)
+          {stepId === 'vitals' && (
+            <VitalsStep
+              onComplete={(r) => {
+                setRatings(r)
+                goNext()
               }}
             />
           )}
-          {step === 3 && hasSymptoms && <SymptomPickerStep onContinue={next} />}
-          {step === 4 && <ReflectionStep onSubmit={next} onSkip={next} />}
-          {step === 5 && <InsightStep onDone={() => goTo(0)} />}
+          {stepId === 'lowVital' && (
+            <LowVitalStep lowVitals={lowVitals} onContinue={goNext} />
+          )}
+          {stepId === 'branch' && (
+            <BranchStep
+              onAnswer={(answer) => {
+                setHasSymptoms(answer)
+                if (answer) {
+                  setStepId('symptoms')
+                } else {
+                  setStepId('reflection')
+                }
+              }}
+            />
+          )}
+          {stepId === 'symptoms' && <SymptomPickerStep onContinue={goNext} />}
+          {stepId === 'reflection' && <ReflectionStep onSubmit={goNext} onSkip={goNext} />}
+          {stepId === 'insight' && <InsightStep onDone={() => setStepId('aqi')} />}
         </CheckinLayout>
       </motion.div>
     </AnimatePresence>

@@ -1,11 +1,26 @@
+import { getProfile } from '@/utils/storage'
+
 interface AirQualityStepProps {
   onStart: () => void
 }
 
 export default function AirQualityStep({ onStart }: AirQualityStepProps) {
+  const profile = getProfile()
+  const city = profile?.city || 'your city'
+
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8 text-center">
+      <div className="flex flex-col items-center gap-1">
+        <h1 className="text-2xl font-light text-teal-700 dark:text-teal-300">Deep Breath</h1>
+        <p className="text-sm text-gray-400 dark:text-gray-500">
+          Track how air quality shapes how you feel.
+        </p>
+      </div>
+
       <div className="flex flex-col items-center gap-3">
+        <p className="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          Air Quality Index
+        </p>
         <div className="flex h-36 w-36 items-center justify-center rounded-full bg-[var(--color-aqi-good)]/20 ring-4 ring-[var(--color-aqi-good)]/30">
           <div className="flex flex-col items-center">
             <span className="text-5xl font-light text-[var(--color-aqi-good)]">42</span>
@@ -15,9 +30,10 @@ export default function AirQualityStep({ onStart }: AirQualityStepProps) {
           </div>
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          Oakland — Laney College
+          Today in <span className="font-medium text-gray-700 dark:text-gray-200">{city}</span>
         </p>
       </div>
+
       <div className="flex flex-col items-center gap-2">
         <h2 className="text-xl font-light text-gray-800 dark:text-gray-100">
           Ready to check in?

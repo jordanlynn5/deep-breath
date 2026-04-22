@@ -36,19 +36,19 @@ describe('Router', () => {
   it('renders check-in page at /checkin inside AppShell', () => {
     renderWithRouter(['/checkin'])
     expect(screen.getByRole('button', { name: /start check-in/i })).toBeInTheDocument()
-    expect(screen.getByText('Deep Breath')).toBeInTheDocument()
+    expect(screen.getAllByText('Deep Breath').length).toBeGreaterThan(0)
   })
 
   it('renders history page at /history inside AppShell', () => {
     renderWithRouter(['/history'])
     expect(screen.getByRole('heading', { name: /history/i, level: 1 })).toBeInTheDocument()
-    expect(screen.getByText('Deep Breath')).toBeInTheDocument()
+    expect(screen.getAllByText('Deep Breath').length).toBeGreaterThan(0)
   })
 
   it('renders settings page at /settings inside AppShell', () => {
     renderWithRouter(['/settings'])
     expect(screen.getByRole('heading', { name: /settings/i, level: 1 })).toBeInTheDocument()
-    expect(screen.getByText('Deep Breath')).toBeInTheDocument()
+    expect(screen.getAllByText('Deep Breath').length).toBeGreaterThan(0)
   })
 
   it('onboarding page does not show bottom nav', () => {
