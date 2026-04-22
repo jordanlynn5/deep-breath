@@ -1,12 +1,34 @@
-// 7 columns × 5 rows = 35 days
-const intensities = Array.from({ length: 35 }, (_, i) => {
-  const cycle = [0, 0.15, 0.3, 0.5, 0.7, 0.9, 0.4]
-  return cycle[i % cycle.length] ?? 0
-})
+import type { CheckIn } from '@/types'
+
+interface Props {
+  checkins: CheckIn[]
+}
+
+function wellnessScore(c: CheckIn): number {
+  const vals = Object.values(c.vitals)
+  return vals.reduce((a, b) => a + b, 0) / vals.length
+}
+
+function scoreToColor(score: number): string {
+  if (score >= 4.5) return '#0d9488'
+  if (score >= 3.5) return '#5eead4'
+  if (score >= 2.5) return '#f59e0b'
+  if (score >= 1.5) return '#f97316'
+  return '#ef4444'
+}
 
 const dayLabels = ['M', 'T', 'W', 'T', 'F', 'S', 'S']
 
-export default function HeatmapPlaceholder() {
+export default function HeatmapPlaceholder({ checkins }: Props) {
+  const byDate = new Map(checkins.map((c) => [c.date, c]))
+
+  // Last 35 days (5 weeks × 7), oldest first
+  const days = Array.from({ length: 35 }, (_, i) => {
+    const d = new Date()
+    d.setDate(d.getDate() - (34 - i))
+    return d.toISOString().slice(0, 10)
+  })
+
   return (
     <div className="flex flex-col gap-2">
       <div className="grid grid-cols-[auto_1fr] gap-2">
@@ -16,31 +38,30 @@ export default function HeatmapPlaceholder() {
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1.5">
-          {intensities.map((intensity, i) => (
-            <div
-              key={i}
-              className="aspect-square rounded"
-              style={{
-                backgroundColor:
-                  intensity === 0
-                    ? 'rgba(148, 163, 184, 0.15)'
-                    : `rgba(20, 184, 166, ${0.2 + intensity * 0.8})`,
-              }}
-              aria-label={`Day ${i + 1}`}
-            />
-          ))}
+          {days.map((date) => {
+            const checkin = byDate.get(date)
+            const color = checkin
+              ? scoreToColor(wellnessScore(checkin))
+              : 'rgba(148, 163, 184, 0.15)'
+            return (
+              <div
+                key={date}
+                className="aspect-square rounded"
+                style={{ backgroundColor: color }}
+                title={checkin
+                  ? `${date}: wellness ${wellnessScore(checkin).toFixed(1)}/5`
+                  : `${date}: no entry`}
+              />
+            )
+          })}
         </div>
       </div>
       <div className="flex items-center justify-end gap-1.5 text-[10px] text-gray-400">
-        <span>Less</span>
-        {[0.2, 0.4, 0.6, 0.8, 1].map((intensity) => (
-          <div
-            key={intensity}
-            className="h-2.5 w-2.5 rounded-sm"
-            style={{ backgroundColor: `rgba(20, 184, 166, ${intensity})` }}
-          />
+        <span>Low</span>
+        {['#ef4444', '#f97316', '#f59e0b', '#5eead4', '#0d9488'].map((c) => (
+          <div key={c} className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: c }} />
         ))}
-        <span>More</span>
+        <span>High</span>
       </div>
     </div>
   )

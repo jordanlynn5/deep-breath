@@ -5,8 +5,12 @@ type TimeRange = (typeof timeRanges)[number]
 
 const symptoms = ['Cough', 'Wheeze', 'Tight Chest'] as const
 
-export default function FilterControls() {
-  const [range, setRange] = useState<TimeRange>('30D')
+interface FilterControlsProps {
+  range: TimeRange
+  onRangeChange: (range: TimeRange) => void
+}
+
+export default function FilterControls({ range, onRangeChange }: FilterControlsProps) {
   const [activeSymptoms, setActiveSymptoms] = useState<Set<string>>(new Set())
 
   const toggleSymptom = (symptom: string) => {
@@ -25,7 +29,7 @@ export default function FilterControls() {
           <button
             key={r}
             type="button"
-            onClick={() => setRange(r)}
+            onClick={() => onRangeChange(r)}
             className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
               range === r
                 ? 'bg-teal-500 text-white'
