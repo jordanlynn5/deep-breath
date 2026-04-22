@@ -1,4 +1,5 @@
-import { getStreak } from '@/utils/storage'
+import { useState, useEffect } from 'react'
+import { getCheckIns, getStreak } from '@/utils/storage'
 import type { AqiSnapshot } from '@/types'
 
 interface InsightStepProps {
@@ -27,6 +28,39 @@ const PLACEHOLDER_SCORES = [
 
 export default function InsightStep({ onDone }: InsightStepProps) {
   const streak = getStreak()
+  const [insight, setInsight] = useState<string | null>(null)
+  const [insightLoading, setInsightLoading] = useState(true)
+
+  useEffect(() => {
+    const allCheckins = getCheckIns()
+    const [today, ...rest] = allCheckins
+    if (!today) { setInsightLoading(false); return }
+
+    const payload = {
+      today: {
+        date: today.date,
+        vitals: today.vitals,
+        symptoms: today.symptoms,
+        aqi: today.aqi?.aqi ?? null,
+      },
+      history: rest.slice(0, 6).map((c) => ({
+        date: c.date,
+        vitals: c.vitals,
+        symptoms: c.symptoms,
+        aqi: c.aqi?.aqi ?? null,
+      })),
+    }
+
+    fetch('/api/insights', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then((r) => r.json())
+      .then((data: { insight?: string }) => setInsight(data.insight ?? null))
+      .catch(() => setInsight(null))
+      .finally(() => setInsightLoading(false))
+  }, [])
 
   return (
     <div className="flex flex-1 flex-col gap-6">
@@ -42,8 +76,9 @@ export default function InsightStep({ onDone }: InsightStepProps) {
           Today's Insight
         </p>
         <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
-          Your energy tends to rise when the air quality index stays below 50.
-          Keep breathing easy.
+          {insightLoading
+            ? 'Generating your insight…'
+            : insight ?? 'Keep tracking — patterns emerge over time.'}
         </p>
       </div>
 
