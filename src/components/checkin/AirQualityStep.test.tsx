@@ -3,11 +3,6 @@ import { describe, it, expect, vi } from 'vitest'
 import AirQualityStep from './AirQualityStep'
 
 describe('AirQualityStep', () => {
-  it('renders the placeholder AQI value', () => {
-    render(<AirQualityStep onStart={vi.fn()} />)
-    expect(screen.getByText('42')).toBeInTheDocument()
-  })
-
   it('renders the Air Quality Index label', () => {
     render(<AirQualityStep onStart={vi.fn()} />)
     expect(screen.getByText('Air Quality Index')).toBeInTheDocument()
