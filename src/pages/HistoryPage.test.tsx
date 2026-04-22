@@ -23,4 +23,9 @@ describe('HistoryPage', () => {
     expect(screen.getByText(/wellness vs\. air quality/i)).toBeInTheDocument()
     expect(screen.getByTestId('chart-placeholder')).toBeInTheDocument()
   })
+
+  it('shows empty state when no check-ins exist', () => {
+    render(<HistoryPage />)
+    expect(screen.getByText(/no check-ins in this period/i)).toBeInTheDocument()
+  })
 })
