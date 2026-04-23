@@ -58,18 +58,6 @@ export default function FilterControls({ range, onRangeChange }: FilterControlsP
           </button>
         ))}
       </div>
-      <label className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 dark:text-gray-400">Pollutant</span>
-        <select
-          className="rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
-          defaultValue="pm25"
-        >
-          <option value="pm25">PM2.5</option>
-          <option value="pm10">PM10</option>
-          <option value="o3">Ozone</option>
-          <option value="no2">NO₂</option>
-        </select>
-      </label>
     </div>
   )
 }
