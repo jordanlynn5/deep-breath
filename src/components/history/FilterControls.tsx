@@ -1,25 +1,22 @@
-import { useState } from 'react'
 
 const timeRanges = ['7D', '30D', '90D'] as const
 type TimeRange = (typeof timeRanges)[number]
 
-const symptoms = ['Cough', 'Wheeze', 'Tight Chest'] as const
+export const SYMPTOMS = ['Cough', 'Wheeze', 'Tight Chest'] as const
 
 interface FilterControlsProps {
   range: TimeRange
   onRangeChange: (range: TimeRange) => void
+  activeSymptoms: Set<string>
+  onSymptomsChange: (symptoms: Set<string>) => void
 }
 
-export default function FilterControls({ range, onRangeChange }: FilterControlsProps) {
-  const [activeSymptoms, setActiveSymptoms] = useState<Set<string>>(new Set())
-
+export default function FilterControls({ range, onRangeChange, activeSymptoms, onSymptomsChange }: FilterControlsProps) {
   const toggleSymptom = (symptom: string) => {
-    setActiveSymptoms((prev) => {
-      const next = new Set(prev)
-      if (next.has(symptom)) next.delete(symptom)
-      else next.add(symptom)
-      return next
-    })
+    const next = new Set(activeSymptoms)
+    if (next.has(symptom)) next.delete(symptom)
+    else next.add(symptom)
+    onSymptomsChange(next)
   }
 
   return (
@@ -42,7 +39,7 @@ export default function FilterControls({ range, onRangeChange }: FilterControlsP
         ))}
       </div>
       <div className="flex flex-wrap gap-2">
-        {symptoms.map((s) => (
+        {SYMPTOMS.map((s) => (
           <button
             key={s}
             type="button"

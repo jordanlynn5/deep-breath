@@ -4,8 +4,16 @@ import FilterControls from './FilterControls'
 
 function renderControls(range: '7D' | '30D' | '90D' = '30D') {
   const onRangeChange = vi.fn()
-  render(<FilterControls range={range} onRangeChange={onRangeChange} />)
-  return { onRangeChange }
+  const onSymptomsChange = vi.fn()
+  render(
+    <FilterControls
+      range={range}
+      onRangeChange={onRangeChange}
+      activeSymptoms={new Set()}
+      onSymptomsChange={onSymptomsChange}
+    />
+  )
+  return { onRangeChange, onSymptomsChange }
 }
 
 describe('FilterControls', () => {
@@ -29,9 +37,16 @@ describe('FilterControls', () => {
   })
 
   it('toggles symptom filters', async () => {
-    renderControls()
-    const btn = screen.getByRole('button', { name: 'Cough' })
-    await userEvent.setup().click(btn)
-    expect(btn).toHaveAttribute('aria-pressed', 'true')
+    const onSymptomsChange = vi.fn()
+    render(
+      <FilterControls
+        range="30D"
+        onRangeChange={vi.fn()}
+        activeSymptoms={new Set()}
+        onSymptomsChange={onSymptomsChange}
+      />
+    )
+    await userEvent.setup().click(screen.getByRole('button', { name: 'Cough' }))
+    expect(onSymptomsChange).toHaveBeenCalledWith(new Set(['Cough']))
   })
 })

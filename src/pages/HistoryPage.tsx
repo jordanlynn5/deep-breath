@@ -8,9 +8,13 @@ const RANGE_DAYS = { '7D': 7, '30D': 30, '90D': 90 }
 
 export default function HistoryPage() {
   const [range, setRange] = useState<'7D' | '30D' | '90D'>('30D')
+  const [activeSymptoms, setActiveSymptoms] = useState<Set<string>>(new Set())
   const allCheckins = getCheckIns()
   const cutoff = Date.now() - RANGE_DAYS[range] * 24 * 60 * 60 * 1000
   const filtered = allCheckins.filter((c) => c.timestamp >= cutoff)
+  const chartCheckins = activeSymptoms.size > 0
+    ? filtered.filter((c) => c.symptoms.some((s) => activeSymptoms.has(s)))
+    : filtered
 
   return (
     <div className="flex flex-col gap-8 py-6">
@@ -21,7 +25,12 @@ export default function HistoryPage() {
         </p>
       </div>
 
-      <FilterControls range={range} onRangeChange={setRange} />
+      <FilterControls
+        range={range}
+        onRangeChange={setRange}
+        activeSymptoms={activeSymptoms}
+        onSymptomsChange={setActiveSymptoms}
+      />
 
       <section className="flex flex-col gap-3">
         <h2 className="text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
@@ -37,7 +46,7 @@ export default function HistoryPage() {
           Wellness vs. Air Quality
         </h2>
         <div className="rounded-2xl bg-white p-4 dark:bg-gray-800">
-          <ChartPlaceholder checkins={filtered} />
+          <ChartPlaceholder checkins={chartCheckins} />
         </div>
       </section>
 
