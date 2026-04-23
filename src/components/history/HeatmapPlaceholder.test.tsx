@@ -23,7 +23,7 @@ const makeCheckIn = (daysAgo: number, avg: number): CheckIn => {
 describe('HeatmapPlaceholder', () => {
   it('renders 35 day cells', () => {
     const { container } = render(<HeatmapPlaceholder checkins={[]} />)
-    const cells = container.querySelectorAll('div.aspect-square')
+    const cells = container.querySelectorAll('button.aspect-square')
     expect(cells).toHaveLength(35)
   })
 
@@ -35,14 +35,14 @@ describe('HeatmapPlaceholder', () => {
 
   it('colors today with teal for a high wellness score', () => {
     const { container } = render(<HeatmapPlaceholder checkins={[makeCheckIn(0, 5)]} />)
-    const cells = Array.from(container.querySelectorAll('div.aspect-square'))
+    const cells = Array.from(container.querySelectorAll('button.aspect-square'))
     const today = cells[cells.length - 1] as HTMLElement
     expect(today.style.backgroundColor).toBe('rgb(13, 148, 136)')
   })
 
   it('colors today with red for a low wellness score', () => {
     const { container } = render(<HeatmapPlaceholder checkins={[makeCheckIn(0, 1)]} />)
-    const cells = Array.from(container.querySelectorAll('div.aspect-square'))
+    const cells = Array.from(container.querySelectorAll('button.aspect-square'))
     const today = cells[cells.length - 1] as HTMLElement
     expect(today.style.backgroundColor).toBe('rgb(239, 68, 68)')
   })

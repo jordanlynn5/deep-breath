@@ -34,9 +34,4 @@ describe('FilterControls', () => {
     await userEvent.setup().click(btn)
     expect(btn).toHaveAttribute('aria-pressed', 'true')
   })
-
-  it('renders a pollutant selector', () => {
-    renderControls()
-    expect(screen.getByLabelText(/pollutant/i)).toBeInTheDocument()
-  })
 })

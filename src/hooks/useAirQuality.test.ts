@@ -70,16 +70,17 @@ describe('useAirQuality', () => {
     expect(result.current.error).toBe('Network error')
   })
 
-  it('sets error and loading=false when geocoding returns non-ok response', async () => {
+  it('sets error and loading=false when /api/aqi returns non-ok response', async () => {
     fetchMock.mockResolvedValueOnce({
       ok: false,
       status: 429,
-    } as Response)
+      json: async () => ({ error: 'Rate limited' }),
+    } as unknown as Response)
 
     const { result } = renderHook(() => useAirQuality('Paris'))
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(result.current.snapshot).toBeNull()
-    expect(result.current.error).toMatch(/Geocoding failed/)
+    expect(result.current.error).toBe('Rate limited')
   })
 })
