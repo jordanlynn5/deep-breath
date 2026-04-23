@@ -14,7 +14,7 @@ export default function AirQualityStep({ onStart }: AirQualityStepProps) {
   const colorVar = snapshot ? aqiLevelToCssVar(snapshot.level) : 'var(--color-aqi-good)'
   const aqiNum = snapshot?.aqi ?? '—'
   const label = snapshot ? AQI_LABELS[snapshot.level] : '—'
-  const stationLine = (snapshot?.stationName ?? city) || 'your city'
+  const stationLine = city || 'your city'
 
   const AppHeader = (
     <div className="flex flex-col items-center gap-1">
