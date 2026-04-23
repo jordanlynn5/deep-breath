@@ -106,7 +106,7 @@ export default function HeatmapPlaceholder({ checkins }: Props) {
             {(Object.entries(selected.vitals) as [VitalName, number][]).map(([key, val]) => (
               <div key={key} className="flex flex-col items-center gap-0.5">
                 <span className="text-[10px] text-gray-400 dark:text-gray-500">
-                  {vitalLabels[key].slice(0, 3)}
+                  {vitalLabels[key]}
                 </span>
                 <span className="text-sm font-medium text-teal-700 dark:text-teal-300">
                   {val}
